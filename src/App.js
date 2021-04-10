@@ -7,25 +7,36 @@ import Map from "./components/Map";
 function App() {
     const [login, setLogin] = useState("");
     const [token, setToken] = useState("");
-    const [position, setPosition] = useState([51.505, -0.09]);
+    const [position, setPosition] = useState([
+        [51.505, -0.09],
+        [51.505, -0.091],
+        [51.505, -0.092],
+        [51.505, -0.093],
+        [51.505, -0.094],
+    ]);
     const [speed, setSpeed] = useState(0);
     const [battery, setBattery] = useState(0);
     const [time, setTime] = useState("10 AM");
 
     const requestLocation = (jwtoken) => {
-        fetch("location/get", {
+        fetch("location/get/10", {
             method: "GET",
             headers: { "Content-Type": "application/json", "x-access-token": jwtoken ? jwtoken : token },
         })
             .then((response) => response.json())
             .then((data) => {
-                // console.log("LOCATION", data);
-                const time = new Date(data.time * 1000).toTimeString().substr(0, 8);
+                console.log("LOCATION", data);
+                const time = new Date(data[0].time * 1000).toTimeString().substr(0, 8);
                 // console.log(time);
+                const tempPos = [];
+                for (let loc of data) {
+                    tempPos.push([loc.location.latitude, loc.location.longitude]);
+                }
+                console.log("POS ARRAY", tempPos);
 
-                setPosition([data.location.latitude, data.location.longitude]);
-                setBattery(data.battery);
-                setSpeed(data.speed);
+                setPosition(tempPos);
+                setBattery(data[0].battery);
+                setSpeed(data[0].speed);
                 setTime(time);
             });
     };
